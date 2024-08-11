@@ -1,33 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import mongoose from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/register.dto';
-import { UpdateAuthDto } from './dto/login.dto';
+import { LoginUserDto } from './dto/login.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { user, user_model } from './schema/user.schema';
-import mongoose from 'mongoose';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(user_model)
-    private userModel : mongoose.Model<user>
+    private userModel: mongoose.Model<user>,
+    private JwtService: JwtService,
   ) {}
-  create(CreateUserDto: CreateUserDto) {
-    return 'This action adds a new auth';
+  async register_user(
+    CreateUserDto: CreateUserDto,
+  ): Promise<{ token: string; message: string }> {
+    const { name, email, password } = CreateUserDto;
+
+    const userInfo = await this.userModel.findOne({ email });
+
+    if (userInfo) {
+      throw new ConflictException('Email already exists');
+    } else {
+      const new_user = await this.userModel.create({
+        name: name.trim(),
+        email: email.trim(),
+        password: await bcrypt.hash(password, 10),
+      });
+
+      const token = await this.JwtService.sign({
+        _id: new_user.id,
+        name: new_user.name,
+      });
+
+      return { token, message: 'User registerd successfully' };
+    }
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login_user(
+    LoginUserDto: LoginUserDto,
+  ): Promise<{ token: string; message: string }> {
+    const { email, password } = LoginUserDto;
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    const userInfo = await this.userModel
+      .findOne({ email })
+      .select('+password');
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    if (userInfo) {
+      const check_password = await bcrypt.compare(password, userInfo.password);
+      if (check_password) {
+        const token = await this.JwtService.sign({
+          _id: userInfo.id,
+          name: userInfo.name,
+        });
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+        return { token, message: 'User logged in successfully' };
+      } else {
+        throw new UnauthorizedException('Email or password is incorrect');
+      }
+    } else {
+      throw new NotFoundException('User not found');
+    }
   }
 }

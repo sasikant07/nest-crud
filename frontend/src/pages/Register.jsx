@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { base_url } from "../utils/config";
 
 const user = {
@@ -21,10 +22,15 @@ const Register = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${base_url}/api/auth/user/register`, state);
-      console.log(data);
+      const { data } = await axios.post(
+        `${base_url}/api/auth/user/register`,
+        state
+      );
+      localStorage.setItem("crud_token", data.token);
+      toast.success(data.message);
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.message);
     }
     setState(user);
   };
