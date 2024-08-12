@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { base_url } from "../utils/config";
+import storeContext from "../context/storeContext";
 
 const user = {
   email: "",
@@ -9,7 +11,10 @@ const user = {
 };
 
 const Login = () => {
+  const { dispatch } = useContext(storeContext);
+  const navigate = useNavigate();
   const [state, setState] = useState(user);
+  const [loader, setLoader] = useState(false);
 
   const inputHandler = (e) => {
     setState({
@@ -21,13 +26,18 @@ const Login = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
+      setLoader(true);
       const { data } = await axios.post(
         `${base_url}/api/auth/user/login`,
         state
       );
+      setLoader(false);
       localStorage.setItem("crud_token", data.token);
       toast.success(data.message);
+      dispatch({ type: "login_success", payload: { token: data.token } });
+      navigate("/user/post");
     } catch (error) {
+      setLoader(false);
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -71,9 +81,10 @@ const Login = () => {
             </div>
             <button
               type="submit"
+              disabled={loader}
               className="bg-indigo-500 w-full hover:bg-indigo-600 text-white rounded-md px-7 py-[6px] text-md"
             >
-              Login
+              {loader ? "Loading..." : "Login"}
             </button>
           </form>
         </div>

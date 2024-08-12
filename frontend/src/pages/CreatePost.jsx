@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Header from "./components/Header";
 import axios from "axios";
 import { base_url } from "../utils/config";
+import storeContext from "../context/storeContext";
+
 const post = {
   title: "",
   description: "",
   image: "",
 };
 const CreatePost = () => {
+  const {store, dispatch} = useContext(storeContext);
   const [state, setState] = useState(post);
   const [image, setImage] = useState("");
 
