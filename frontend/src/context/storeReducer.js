@@ -6,6 +6,10 @@ const storeReducer = (state, action) => {
     state.userInfo = decode_token(payload.token);
     state.token = payload.token;
   }
+  if (type === "logout") {
+    state.userInfo = "";
+    state.token = "";
+  }
   return state;
 };
 

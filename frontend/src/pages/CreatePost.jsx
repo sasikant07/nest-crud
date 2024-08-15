@@ -10,7 +10,7 @@ const post = {
   image: "",
 };
 const CreatePost = () => {
-  const {store, dispatch} = useContext(storeContext);
+  const { store, dispatch } = useContext(storeContext);
   const [state, setState] = useState(post);
   const [image, setImage] = useState("");
 
@@ -40,10 +40,15 @@ const CreatePost = () => {
     try {
       const { data } = await axios.post(
         `${base_url}/api/post/create`,
-        formData
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+          },
+        }
       );
     } catch (error) {
-      console.log(error);
+      console.log(error.response.error);
     }
   };
 

@@ -1,10 +1,18 @@
 import React, { useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import storeContext from "../../context/storeContext";
 
 const Header = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { store, dispatch } = useContext(storeContext);
+
+  const logout = () => {
+    localStorage.removeItem("crud_token");
+    dispatch({ type: "logout", payload: "" });
+    navigate("/login");
+  };
+
   return (
     <div className="w-full h-full p-4 bg-white">
       <div className="w-[80%] mx-auto h-full flex justify-between items-center">
@@ -25,13 +33,11 @@ const Header = () => {
             <Link to="/post/create">Create Post</Link>
           </li>
           {store.userInfo ? (
-            <li className={`px-2 py-[5px] rounded-md`}>
+            <li className={`px-2 py-[5px] rounded-md`} onClick={logout}>
               <span className="cursor-pointer">Logout</span>
             </li>
           ) : (
-            <li
-              className={`px-2 py-[5px] rounded-md`}
-            >
+            <li className={`px-2 py-[5px] rounded-md`}>
               <Link to="/login">Login</Link>
             </li>
           )}
