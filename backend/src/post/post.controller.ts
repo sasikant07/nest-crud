@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FileSystemStoredFile, FormDataRequest } from 'nestjs-form-data';
 import { AuthGuard } from '@nestjs/passport';
+import { post } from './schema/post.schema';
 
 @Controller('post')
 export class PostController {
@@ -21,8 +23,11 @@ export class PostController {
   @Post('/create')
   @UseGuards(AuthGuard())
   @FormDataRequest({ storage: FileSystemStoredFile })
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @Req() req,
+  ): Promise<{ post: post; message: string }> {
+    return this.postService.create(createPostDto, req.user);
   }
 
   @Get()

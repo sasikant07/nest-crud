@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import axios from "axios";
 import { base_url } from "../utils/config";
 import storeContext from "../context/storeContext";
+import toast from "react-hot-toast";
 
 const post = {
   title: "",
@@ -13,6 +14,7 @@ const CreatePost = () => {
   const { store, dispatch } = useContext(storeContext);
   const [state, setState] = useState(post);
   const [image, setImage] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const inputHandler = (e) => {
     setState({
@@ -38,6 +40,7 @@ const CreatePost = () => {
     formData.append("description", state.description);
     formData.append("image", state.image);
     try {
+      setLoader(true);
       const { data } = await axios.post(
         `${base_url}/api/post/create`,
         formData,
@@ -47,8 +50,13 @@ const CreatePost = () => {
           },
         }
       );
+      setLoader(false);
+      toast.success(data.message);
+      setState(post);
+      setImage("");
     } catch (error) {
-      console.log(error.response.error);
+      console.log(error.response.error.message);
+      toast.error(error.response.error.message);
     }
   };
 
@@ -102,10 +110,11 @@ const CreatePost = () => {
               </div>
             )}
             <button
+              disabled={loader}
               type="submit"
               className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-md px-7 py-[6px] text-md"
             >
-              Create
+              {loader ? "Loading..." : "Create"}
             </button>
           </form>
         </div>
