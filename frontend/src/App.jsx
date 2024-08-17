@@ -21,7 +21,7 @@ function App() {
 
           <Route path="/post/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
           <Route path="/post/edit/:postId" element={<ProtectedRoute><EditPost /></ProtectedRoute>} />
-          <Route path="/user/post" element={<ProtectedRoute><AllPost /></ProtectedRoute>} />
+          <Route path="/post/all" element={<ProtectedRoute><AllPost /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
       <Toaster />

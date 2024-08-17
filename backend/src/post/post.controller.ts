@@ -23,16 +23,17 @@ export class PostController {
   @Post('/create')
   @UseGuards(AuthGuard())
   @FormDataRequest({ storage: FileSystemStoredFile })
-  create(
+  async create(
     @Body() createPostDto: CreatePostDto,
     @Req() req,
-  ): Promise<{ post: post; message: string }> {
-    return this.postService.create(createPostDto, req.user);
+  ): Promise<{ post: post, message: string }> {
+    return await this.postService.create(createPostDto, req.user);
   }
 
-  @Get()
-  findAll() {
-    return this.postService.findAll();
+  @Get('/all')
+  @UseGuards(AuthGuard())
+  async get_all_post_by_user(@Req() req): Promise<{ posts: post[]; message: string }> {
+    return await this.postService.find_all_post_by_user(req.user);
   }
 
   @Get(':id')

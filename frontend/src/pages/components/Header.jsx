@@ -23,7 +23,7 @@ const Header = () => {
               pathname === "/user/post" ? "bg-indigo-500 text-white" : ""
             } rounded-md`}
           >
-            <Link to="/user/post">My Post</Link>
+            <Link to="/post/all">My Post</Link>
           </li>
           <li
             className={`px-2 py-[5px] ${

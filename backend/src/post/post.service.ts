@@ -40,8 +40,17 @@ export class PostService {
     };
   }
 
-  findAll() {
-    return `This action returns all post`;
+  async find_all_post_by_user(
+    userInfo,
+  ): Promise<{ posts: post[]; message: string }> {
+    const posts = await this.postModel.find({
+      user_id: new mongoose.Types.ObjectId(userInfo._id),
+    }).exec();
+  
+    return {
+      posts: posts,
+      message: 'User posts fetched successfully',
+    };
   }
 
   findOne(id: number) {
