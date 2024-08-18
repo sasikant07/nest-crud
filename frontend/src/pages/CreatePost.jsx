@@ -11,7 +11,7 @@ const post = {
   image: "",
 };
 const CreatePost = () => {
-  const { store, dispatch } = useContext(storeContext);
+  const { store } = useContext(storeContext);
   const [state, setState] = useState(post);
   const [image, setImage] = useState("");
   const [loader, setLoader] = useState(false);
@@ -94,8 +94,13 @@ const CreatePost = () => {
                 className="px-3 py-[6px] outline-none border border-slate-200 bg-transparent rounded-md focus:border-indigo-500 overflow-hidden"
               ></textarea>
             </div>
+            {image && (
+              <div className="mb-3">
+                <img src={image} alt="" />
+              </div>
+            )}
             <div className="flex flex-col w-full gap-1 mb-5">
-              <label htmlFor="image">Name</label>
+              <label htmlFor="image">Image</label>
               <input
                 onChange={imageHandler}
                 type="file"
@@ -104,11 +109,6 @@ const CreatePost = () => {
                 className="px-3 py-[6px] outline-none border border-slate-200 bg-transparent rounded-md focus:border-indigo-500 overflow-hidden"
               />
             </div>
-            {image && (
-              <div className="mb-3">
-                <img src={image} alt="image" />
-              </div>
-            )}
             <button
               disabled={loader}
               type="submit"

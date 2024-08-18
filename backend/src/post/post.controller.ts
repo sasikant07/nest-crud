@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   UseGuards,
@@ -26,28 +26,43 @@ export class PostController {
   async create(
     @Body() createPostDto: CreatePostDto,
     @Req() req,
-  ): Promise<{ post: post, message: string }> {
+  ): Promise<{ post: post; message: string }> {
     return await this.postService.create(createPostDto, req.user);
   }
 
   @Get('/all')
   @UseGuards(AuthGuard())
-  async get_all_post_by_user(@Req() req): Promise<{ posts: post[]; message: string }> {
+  async get_all_post_by_user(
+    @Req() req,
+  ): Promise<{ posts: post[]; message: string }> {
     return await this.postService.find_all_post_by_user(req.user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  @Get('/all/home')
+  async get_all_post(): Promise<{ posts: post[]}> {
+    return await this.postService.get_all_post();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  @Get(':postId')
+  async findOnePostByUser(@Param('postId') postId: string): Promise<{ post: post }> {
+    return await this.postService.findOnePostByUser(postId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  @Put('update/:postId')
+  @UseGuards(AuthGuard())
+  @FormDataRequest({ storage: FileSystemStoredFile })
+  async updatePost(
+    @Param('postId') postId: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<{ post: post; message: string }> {
+    return await this.postService.updatePost(postId, updatePostDto);
+  }
+
+  @Delete('delete/:postId')
+  @UseGuards(AuthGuard())
+  async remove(
+    @Param('postId') postId: string,
+  ): Promise<{ post: post; message: string }> {
+    return await this.postService.delete_post_by_user(postId);
   }
 }

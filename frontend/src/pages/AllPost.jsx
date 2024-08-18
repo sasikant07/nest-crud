@@ -5,6 +5,7 @@ import axios from "axios";
 import { base_url } from "../utils/config";
 import moment from "moment";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Allpost = () => {
   const [posts, setPosts] = useState([]);
@@ -30,6 +31,24 @@ const Allpost = () => {
     get_my_post();
   }, []);
 
+  const delete_post = async (postId) => {
+    try {
+      const { data } = await axios.delete(
+        `${base_url}/api/post/delete/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+          },
+        }
+      );
+      toast.success(data.message);
+      setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error("Failed to delete post");
+    }
+  };
+
   return (
     <div>
       <Header />
@@ -40,18 +59,24 @@ const Allpost = () => {
           <div className="grid grid-cols-4 gap-5">
             {posts.map((p, i) => (
               <div key={i} className="bg-white p-3 rounded-md block">
-                <img className="w-full h-[190px]" src={p.image} alt="image" />
+                <img className="w-full h-[190px]" src={p.image} alt="" />
                 <h2 className="py-1 text-lg font-bold mt-3">{p.title}</h2>
-                <span>{moment(p.createdAt).format("LL")}</span>
+                <span className="text-gray-500">{moment(p.createdAt).format("LL")}</span>
                 <p>
                   {p.description.slice(0, 100)}
-                  <Link className="text-purple-600">read more</Link>
+                  <Link to={`/post/details/${p._id}`} className="text-purple-600">read more</Link>
                 </p>
                 <div className="mt-2 flex justify-start items-center">
-                  <Link to={`/post/edit/:${p._id}`} className="px-2 py[2px] bg-yellow-100 text-yellow-800 cursor-pointer rounded-md">
+                  <Link
+                    to={`/post/edit/${p._id}`}
+                    className="px-2 py[2px] bg-yellow-100 text-yellow-800 cursor-pointer rounded-md"
+                  >
                     Edit
                   </Link>
-                  <div className="px-2 py[2px] bg-red-100 text-red-800 cursor-pointer rounded-md">
+                  <div
+                    onClick={() => delete_post(p._id)}
+                    className="px-2 py[2px] bg-red-100 text-red-800 cursor-pointer rounded-md"
+                  >
                     Delete
                   </div>
                 </div>

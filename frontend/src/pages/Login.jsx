@@ -35,7 +35,7 @@ const Login = () => {
       localStorage.setItem("crud_token", data.token);
       toast.success(data.message);
       dispatch({ type: "login_success", payload: { token: data.token } });
-      navigate("/user/post");
+      navigate("/post/all");
     } catch (error) {
       setLoader(false);
       console.log(error);

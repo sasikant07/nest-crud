@@ -36,7 +36,7 @@ const Register = () => {
       localStorage.setItem("crud_token", data.token);
       toast.success(data.message);
       dispatch({ type: "register_success", payload: { token: data.token } });
-      navigate("/user/post");
+      navigate("/login");
     } catch (error) {
       setLoader(false);
       console.log(error);
